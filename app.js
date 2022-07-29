@@ -1,21 +1,24 @@
 const express = require('express');
 const { PORT = 3000, BASE_PATH } = process.env;
-const routes  = require('./routes/userRoutes');
+const userRoutes  = require('./routes/userRoutes');
+const cardRoutes  = require('./routes/cardRoutes');
 const mongoose = require('mongoose');
 const app = express();
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
-// app.use((req, res, next) => {
-//     req.user = {
-//         _id: '62e1190e32eba36021defeb9'
-//     };
-//
-//
-//     next();
-// });
+app.use(express.json());
 
-app.use('/users', express.json(), routes);
+app.use((req, res, next) => {
+    req.user = {
+        _id: '62e158d9c1b724fd85bd0788'
+    };
+    next();
+});
+
+app.use('/cards', cardRoutes);
+app.use('/users', userRoutes);
+
 
 
 app.listen(PORT, () => {
