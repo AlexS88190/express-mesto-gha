@@ -13,8 +13,6 @@ const createUser = async (req, res) => {
     } catch (err) {
         if (err._message === 'user validation failed') {
             res.status(400).send({"message": "Переданы некорректные данные при создании пользователя"})
-        } else {
-            res.status(500).send({"message": "Ошибка по умолчанию"})
         }
     }
 }
@@ -28,9 +26,9 @@ const getUserById = async (req, res) => {
         res.send(user);
     } catch (err) {
         if (err.message === 'user is missing') {
-            res.status(400).send({"message": "Запрашиваемый пользователь по указанному _id не найден"})
+            res.status(404).send({"message": "Запрашиваемый пользователь по указанному _id не найден"})
         } else {
-            res.status(500).send({"message": "Ошибка по умолчанию"})
+            res.status(400).send({"message": "Введен некорректный _id пользователя"})
         }
     }
 }
@@ -51,10 +49,6 @@ const updateProfile = async (req, res) => {
         if (err.message === 'user is missing') {
             res.status(404).send({"message": "Пользователь с указанным _id не найден"});
         }
-
-        else {
-            res.status(500).send({"message": "Ошибка по умолчанию"})
-        }
     }
 }
 
@@ -70,12 +64,8 @@ const updateAvatar = async (req, res) => {
         if (err.message === 'user is missing') {
             res.status(404).send({"message": "Пользователь с указанным _id не найден"});
         }
-        else {
-            res.status(500).send({"message": "Ошибка по умолчанию"})
-        }
     }
 }
-
 
 module.exports = {
     getUsers,

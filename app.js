@@ -19,7 +19,14 @@ app.use((req, res, next) => {
 app.use('/cards', cardRoutes);
 app.use('/users', userRoutes);
 
-
+app.use('/', (req, res) => {
+  try {
+    throw new Error('user is missing');
+  }
+  catch (err) {
+    res.status(404).send({"message": "Запрос осуществляется по некорректному url"});
+  }
+});
 
 app.listen(PORT, () => {
     console.log('Server started');

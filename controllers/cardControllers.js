@@ -14,8 +14,6 @@ const createCard = async (req, res) => {
     } catch (err) {
         if (err._message === 'card validation failed') {
             res.status(400).send({"message": "Переданы некорректные данные при создании карточки"})
-        } else {
-            res.status(500).send({"message": "Ошибка по умолчанию"})
         }
     }
 }
@@ -28,7 +26,12 @@ const deleteCard = async (req, res) => {
         }
         res.send(card);
     } catch (err) {
+      if (err.message === 'card is missing') {
         res.status(404).send({"message": "Карточка с указанным _id не найдена"});
+      }
+      else {
+        res.status(400).send({"message": "Некорректный _id карточки"})
+      }
     }
 }
 
@@ -45,7 +48,7 @@ const likeCard = async (req, res) => {
             res.status(404).send({"message": "Передан несуществующий _id карточки"})
         }
         else {
-            res.status(500).send({"message": "Ошибка по умолчанию"})
+            res.status(400).send({"message": "Некорректный _id карточки"})
         }
     }
 }
@@ -61,10 +64,9 @@ const dislikeCard  = async (req, res) => {
         if (err.message === 'card is missing') {
             res.status(404).send({"message": "Передан несуществующий _id карточки"})
         } else {
-            res.status(500).send({"message": "Ошибка по умолчанию"})
+            res.status(400).send({"message": "Некорректный _id карточки"})
         }
     }
-
 }
 
 module.exports = {
