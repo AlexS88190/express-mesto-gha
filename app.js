@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
 const cardRoutes = require('./routes/cardRoutes');
 
+const { login } = require('./controllers/userControllers');
+
 const app = express();
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
@@ -17,6 +19,8 @@ app.use((req, res, next) => {
   };
   next();
 });
+
+app.post('/signin', login);
 
 app.use('/cards', cardRoutes);
 app.use('/users', userRoutes);

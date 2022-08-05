@@ -3,27 +3,47 @@ const {
   ERROR_400, ERROR_404, ERROR_DEFAULT,
 } = require('../utils/constants');
 
-const getUsers = async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (err) {
-    res.status(ERROR_DEFAULT).send({ message: 'Ошибка по-умолчанию' });
-  }
-};
+const jwt = require('jsonwebtoken');
+
 
 const createUser = async (req, res) => {
   try {
-    const { name, about, avatar } = req.body;
-    const user = new User({ name, about, avatar });
+    const hash = await bcrypt.hash(req.body.password, 10);
+    const { name, about, avatar, email } = req.body;
+    const password = hash;
+    const user = new User({ name, about, avatar, email, password });
     await user.save();
     res.send(user);
+
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(ERROR_400).send({ message: 'Переданы некорректные данные при создании пользователя' });
     } else {
       res.status(ERROR_DEFAULT).send({ message: 'Ошибка по-умолчанию' });
     }
+  }
+};
+
+const login = async (req, res) => {
+  const {email, password} = req.body;
+
+  try {
+    const user = await User.findUserByCredentials(email, password);
+
+    const token = jwt.sign({ _id: user._id }, 'encryption-key', { expiresIn: '7d' });
+    res.cookie('jwt', token, { httpOnly: true }).end();
+
+  } catch (err) {
+    res.status(401).send({message: err.message});
+  }
+}
+
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.send(users);
+  } catch (err) {
+    res.status(ERROR_DEFAULT).send({ message: 'Ошибка по-умолчанию' });
   }
 };
 
@@ -87,10 +107,27 @@ const updateAvatar = async (req, res) => {
   }
 };
 
+
+// const login = async (req, res) => {
+//   const { email, password } = req.body;
+//   const user = await User.findOne({ email });
+//
+//   // error
+//
+//   const matched = await bcrypt.compare(password, user.password);
+//   if (matched) {
+//     res.send({ message: 'Всё верно!' });
+//   } //error
+// }
+
+
+
+
 module.exports = {
   getUsers,
   createUser,
   getUserById,
   updateProfile,
   updateAvatar,
+  login
 };
