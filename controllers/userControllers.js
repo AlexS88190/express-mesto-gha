@@ -3,6 +3,7 @@ const {
   ERROR_400, ERROR_404, ERROR_DEFAULT,
 } = require('../utils/constants');
 
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 
