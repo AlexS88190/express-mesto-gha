@@ -4,6 +4,8 @@ const { PORT = 3000, BASE_PATH } = process.env;
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
 const cardRoutes = require('./routes/cardRoutes');
+const auth = require('./middlewares/auth');
+const cookieParser = require('cookie-parser');
 
 const { login, createUser } = require('./controllers/userControllers');
 
@@ -12,6 +14,7 @@ const app = express();
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use((req, res, next) => {
   req.user = {
@@ -22,6 +25,8 @@ app.use((req, res, next) => {
 
 app.post('/signup', createUser);
 app.post('/signin', login);
+
+app.use(auth);
 
 app.use('/cards', cardRoutes);
 app.use('/users', userRoutes);
