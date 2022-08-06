@@ -7,15 +7,14 @@ module.exports = (req, res, next) => {
       throw new Error('токен отсутствует');
     }
     const token = req.cookies.jwt;
-    const payload = jwt.verify(token, 'encryption-key');
 
     // добавить ошибку если токен не тот!!!!!
-    req.user = payload
+    req.user = jwt.verify(token, 'encryption-key');
 
     next()
   }
   catch (err) {
-    res.status(401).send({message: 'Токен отсутствует, необходима авторизация'})
+    res.status(401).send({message: 'Токен отсутствует, необходима авторизация'})    // ДОРАБОТАТЬ!!!!!
   }
 
 }

@@ -20,7 +20,7 @@ const createUser = async (req, res) => {
     if (err.name === 'ValidationError') {
       res.status(ERROR_400).send({ message: 'Переданы некорректные данные при создании пользователя' });
     } else {
-      res.status(ERROR_DEFAULT).send({ message: 'Ошибка по-умолчанию' });
+      res.status(ERROR_DEFAULT).send({ message: 'Ошибка по-умолчанию' });   // ДОРАБОТАТЬ!!!!!
     }
   }
 };
@@ -35,7 +35,7 @@ const login = async (req, res) => {
     res.cookie('jwt', token, { httpOnly: true }).end();
 
   } catch (err) {
-    res.status(401).send({message: err.message});
+    res.status(401).send({message: err.message});   // ДОРАБОТАТЬ!!!!!
   }
 }
 
@@ -47,6 +47,16 @@ const getUsers = async (req, res) => {
     res.status(ERROR_DEFAULT).send({ message: 'Ошибка по-умолчанию' });
   }
 };
+
+const getUserMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+   ['password', "__v"].forEach(elem => delete user._doc[elem])
+    res.send(user);
+  } catch (err) {
+    console.log('ошибка') // ДОРАБОТАТЬ!!!!!
+  }
+}
 
 const getUserById = async (req, res) => {
   try {
@@ -108,24 +118,9 @@ const updateAvatar = async (req, res) => {
   }
 };
 
-
-// const login = async (req, res) => {
-//   const { email, password } = req.body;
-//   const user = await User.findOne({ email });
-//
-//   // error
-//
-//   const matched = await bcrypt.compare(password, user.password);
-//   if (matched) {
-//     res.send({ message: 'Всё верно!' });
-//   } //error
-// }
-
-
-
-
 module.exports = {
   getUsers,
+  getUserMe,
   createUser,
   getUserById,
   updateProfile,
