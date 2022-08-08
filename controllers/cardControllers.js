@@ -38,8 +38,8 @@ const deleteCard = async (req, res) => {
       throw new Error('you have no rights');
     }
 
-    const cardDelete = await Card.findByIdAndRemove(req.params.cardId);
-    res.send(cardDelete);
+    const cardForDelete = await Card.findByIdAndRemove(req.params.cardId);
+    res.send(cardForDelete);
   } catch (err) {
     if (err.message === 'card is missing') {
       res.status(ERROR_404).send({ message: 'Карточка с указанным _id не найдена' });

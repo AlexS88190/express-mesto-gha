@@ -30,12 +30,13 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true
+    required: true,
+    select: false
   }
 });
 
 userSchema.statics.findUserByCredentials = async function (email, password) {
-  const user = await this.findOne({ email });
+  const user = await this.findOne({ email }).select('+password');
   if (!user) {
     throw new Error('Неправильная почта');    // ДОРАБОТАТЬ!!!!!
   }
