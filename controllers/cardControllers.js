@@ -30,16 +30,23 @@ const createCard = async (req, res) => {
 
 const deleteCard = async (req, res) => {
   try {
-    const card = await Card.findByIdAndRemove(req.params.cardId);
+    const card = await Card.findById(req.params.cardId);
     if (card === null) {
       throw new Error('card is missing');
     }
-    res.send(card);
+    if (req.user._id !== card.owner.toString()) {
+      throw new Error('you have no rights');
+    }
+
+    const cardDelete = await Card.findByIdAndRemove(req.params.cardId);
+    res.send(cardDelete);
   } catch (err) {
     if (err.message === 'card is missing') {
       res.status(ERROR_404).send({ message: 'Карточка с указанным _id не найдена' });
     } else if (err.name === 'CastError') {
       res.status(ERROR_400).send({ message: 'Некорректный _id карточки' });
+    } else if (err.message === 'you have no rights') {
+      res.status(ERROR_400).send({ message: 'У вас нет прав для удаления данной карточки' });
     } else {
       res.status(ERROR_DEFAULT).send({ message: 'Ошибка по-умолчанию' });
     }

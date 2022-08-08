@@ -51,7 +51,7 @@ const getUsers = async (req, res) => {
 const getUserMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
-   ['password', "__v"].forEach(elem => delete user._doc[elem])
+    ['password', "__v"].forEach(elem => delete user[elem.toString()])
     res.send(user);
   } catch (err) {
     console.log('ошибка') // ДОРАБОТАТЬ!!!!!
