@@ -4,6 +4,7 @@ const { PORT = 3000, BASE_PATH } = process.env;
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
 const cardRoutes = require('./routes/cardRoutes');
+
 const auth = require('./middlewares/auth');
 const cookieParser = require('cookie-parser');
 
@@ -33,6 +34,11 @@ app.use('/users', userRoutes);
 
 app.use('/', (req, res) => {
   res.status(404).send({ message: 'Запрос осуществляется по некорректному url' });
+});
+
+app.use((err, req, res, next) => {
+    const { statusCode = 500, message } = err;
+    res.status(statusCode).send({ message: statusCode === 500 ? 'На сервере произошла ошибка' : message })
 });
 
 app.listen(PORT, () => {

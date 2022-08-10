@@ -1,18 +1,19 @@
 const Card = require('../models/card');
-const {
-  ERROR_400, ERROR_404, ERROR_DEFAULT,
-} = require('../utils/constants');
 
-const getCards = async (req, res) => {
+const BadRequestError = require('../errors/badRequestError');
+const NotFoundError = require('../errors/notFoundError');
+const UnauthorizedError = require('../errors/unauthorizedError');
+
+const getCards = async (req, res, next) => {
   try {
     const cards = await Card.find({});
     res.send(cards);
   } catch (err) {
-    res.status(ERROR_DEFAULT).send({ message: 'Ошибка по-умолчанию' });
+    next(err)
   }
 };
 
-const createCard = async (req, res) => {
+const createCard = async (req, res, next) => {
   try {
     req.body.owner = req.user._id;
     const { name, link, owner } = req.body;
@@ -21,39 +22,35 @@ const createCard = async (req, res) => {
     res.send(card);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(ERROR_400).send({ message: 'Переданы некорректные данные при создании карточки' });
-    } else {
-      res.status(ERROR_DEFAULT).send({ message: 'Ошибка по-умолчанию' });
+      const err = new BadRequestError('переданы некорректные данные при создании карточки');
+      next(err)
     }
+    next(err)
   }
 };
 
-const deleteCard = async (req, res) => {
+const deleteCard = async (req, res, next) => {
   try {
     const card = await Card.findById(req.params.cardId);
     if (card === null) {
-      throw new Error('card is missing');
+      throw new NotFoundError('карточка с указанным _id не найдена');
     }
     if (req.user._id !== card.owner.toString()) {
-      throw new Error('you have no rights');
+      throw new UnauthorizedError('у вас нет прав для удаления данной карточки');
     }
+    card.remove()
 
-    const cardForDelete = await Card.findByIdAndRemove(req.params.cardId);
-    res.send(cardForDelete);
+    res.send({'message': `карточка с id ${card._id} удалена`});
   } catch (err) {
-    if (err.message === 'card is missing') {
-      res.status(ERROR_404).send({ message: 'Карточка с указанным _id не найдена' });
-    } else if (err.name === 'CastError') {
-      res.status(ERROR_400).send({ message: 'Некорректный _id карточки' });
-    } else if (err.message === 'you have no rights') {
-      res.status(ERROR_400).send({ message: 'У вас нет прав для удаления данной карточки' });
-    } else {
-      res.status(ERROR_DEFAULT).send({ message: 'Ошибка по-умолчанию' });
+    if (err.name === 'CastError') {
+      const err = new BadRequestError('некорректный _id карточки')
+      next(err)
     }
+    next(err)
   }
 };
 
-const likeCard = async (req, res) => {
+const likeCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
@@ -62,21 +59,19 @@ const likeCard = async (req, res) => {
     );
 
     if (card === null) {
-      throw new Error('card is missing');
+      throw new NotFoundError('карточка с указанным _id не найдена');
     }
     res.send(card);
   } catch (err) {
-    if (err.message === 'card is missing') {
-      res.status(ERROR_404).send({ message: 'Карточка с указанным _id не найдена' });
-    } else if (err.name === 'CastError') {
-      res.status(ERROR_400).send({ message: 'Некорректный _id карточки' });
-    } else {
-      res.status(ERROR_DEFAULT).send({ message: 'Ошибка по-умолчанию' });
+    if (err.name === 'CastError') {
+      const err = new BadRequestError('некорректный _id карточки');
+      next(err)
     }
+    next(err)
   }
 };
 
-const dislikeCard = async (req, res) => {
+const dislikeCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
@@ -84,17 +79,15 @@ const dislikeCard = async (req, res) => {
       { new: true },
     );
     if (card === null) {
-      throw new Error('card is missing');
+      throw new NotFoundError('карточка с указанным _id не найдена');
     }
     res.send(card);
   } catch (err) {
-    if (err.message === 'card is missing') {
-      res.status(ERROR_404).send({ message: 'Карточка с указанным _id не найдена' });
-    } else if (err.name === 'CastError') {
-      res.status(ERROR_400).send({ message: 'Некорректный _id карточки' });
-    } else {
-      res.status(ERROR_DEFAULT).send({ message: 'Ошибка по-умолчанию' });
+    if (err.name === 'CastError') {
+      const err = new BadRequestError('некорректный _id карточки');
+      next(err)
     }
+    next(err)
   }
 };
 
