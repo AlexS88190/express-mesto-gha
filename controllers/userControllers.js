@@ -23,12 +23,12 @@ const createUser = async (req, res, next) => {
     if (err.name === 'ValidationError') {
       const err = new BadRequestError('переданы некорректные данные при создании пользователя');
       next(err);
-    }
-    if (err.code === 11000) {
+    } else if (err.code === 11000) {
       const err = new ConflictError('пользователь с таким e-mail уже существует');
       next(err);
+    } else {
+      next(err);
     }
-    next(err);
   }
 };
 
@@ -86,8 +86,9 @@ const updateProfile = async (req, res, next) => {
     if (err.name === 'ValidationError') {
       const err = new BadRequestError('переданы некорректные данные при обновлении пользователя');
       next(err);
+    } else {
+      next(err);
     }
-    next(err);
   }
 };
 
@@ -100,8 +101,9 @@ const updateAvatar = async (req, res, next) => {
     if (err.name === 'ValidationError') {
       const err = new BadRequestError('переданы некорректные данные при обновлении аватара');
       next(err);
+    } else {
+      next(err);
     }
-    next(err);
   }
 };
 

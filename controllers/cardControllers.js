@@ -24,8 +24,9 @@ const createCard = async (req, res, next) => {
     if (err.name === 'ValidationError') {
       const err = new BadRequestError('переданы некорректные данные при создании карточки');
       next(err);
+    } else {
+      next(err);
     }
-    next(err);
   }
 };
 
@@ -45,8 +46,9 @@ const deleteCard = async (req, res, next) => {
     if (err.name === 'CastError') {
       const err = new BadRequestError('некорректный _id карточки');
       next(err);
+    } else {
+      next(err);
     }
-    next(err);
   }
 };
 
@@ -57,7 +59,6 @@ const likeCard = async (req, res, next) => {
       { $addToSet: { likes: req.user._id } },
       { new: true },
     );
-
     if (card === null) {
       throw new NotFoundError('карточка с указанным _id не найдена');
     }
@@ -66,8 +67,9 @@ const likeCard = async (req, res, next) => {
     if (err.name === 'CastError') {
       const err = new BadRequestError('некорректный _id карточки');
       next(err);
+    } else {
+      next(err);
     }
-    next(err);
   }
 };
 
@@ -86,8 +88,9 @@ const dislikeCard = async (req, res, next) => {
     if (err.name === 'CastError') {
       const err = new BadRequestError('некорректный _id карточки');
       next(err);
+    } else {
+      next(err);
     }
-    next(err);
   }
 };
 

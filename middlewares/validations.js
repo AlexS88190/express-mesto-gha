@@ -2,9 +2,9 @@ const { celebrate, Joi } = require('celebrate');
 
 const validateUserBody = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
+    name: Joi.string(),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(new RegExp(/https?:\/\/((\w+[.\-\/])+\w{2,})[a-z\-._~:/?#\[\]@!$&'()*+,;=0-9]*/)),
+    avatar: Joi.string(),
     email: Joi.string().email().required(),
     password: Joi.string().required(),
   })
