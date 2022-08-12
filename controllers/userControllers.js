@@ -1,6 +1,6 @@
-const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 const BadRequestError = require('../errors/badRequestError');
 const NotFoundError = require('../errors/notFoundError');
@@ -9,36 +9,39 @@ const ConflictError = require('../errors/conflictError');
 const createUser = async (req, res, next) => {
   try {
     const hash = await bcrypt.hash(req.body.password, 10);
-    const { name, about, avatar, email } = req.body;
+    const {
+      name, about, avatar, email,
+    } = req.body;
     const password = hash;
-    const user = new User({ name, about, avatar, email, password });
+    const user = new User({
+      name, about, avatar, email, password,
+    });
     await user.save();
     user.password = undefined;
     res.send(user);
-
   } catch (err) {
     if (err.name === 'ValidationError') {
       const err = new BadRequestError('переданы некорректные данные при создании пользователя');
       next(err);
     }
     if (err.code === 11000) {
-      const err = new ConflictError('пользователь с таким e-mail уже существует')
-      next(err)
+      const err = new ConflictError('пользователь с таким e-mail уже существует');
+      next(err);
     }
-   next(err)
+    next(err);
   }
 };
 
 const login = async (req, res, next) => {
   try {
-    const {email, password} = req.body;
+    const { email, password } = req.body;
     const user = await User.findUserByCredentials(email, password);
     const token = jwt.sign({ _id: user._id }, 'encryption-key', { expiresIn: '7d' });
     res.cookie('jwt', token, { httpOnly: true }).send({ message: 'вы успешно зарегистрировались!' });
   } catch (err) {
     next(err);
   }
-}
+};
 
 const getUsers = async (req, res, next) => {
   try {
@@ -56,7 +59,7 @@ const getUserMe = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
+};
 
 const getUserById = async (req, res, next) => {
   try {
@@ -66,7 +69,7 @@ const getUserById = async (req, res, next) => {
     }
     res.send(user);
   } catch (err) {
-    next(err)
+    next(err);
   }
 };
 
@@ -96,9 +99,9 @@ const updateAvatar = async (req, res, next) => {
   } catch (err) {
     if (err.name === 'ValidationError') {
       const err = new BadRequestError('переданы некорректные данные при обновлении аватара');
-      next(err)
+      next(err);
     }
-    next(err)
+    next(err);
   }
 };
 
@@ -109,5 +112,5 @@ module.exports = {
   getUserById,
   updateProfile,
   updateAvatar,
-  login
+  login,
 };

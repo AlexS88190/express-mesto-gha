@@ -3,7 +3,6 @@ const UnauthorizedError = require('../errors/unauthorizedError');
 
 module.exports = (req, res, next) => {
   try {
-
     if (!req.cookies.jwt) {
       throw new UnauthorizedError('токен отсутствует, необходима авторизация');
     }
@@ -11,13 +10,12 @@ module.exports = (req, res, next) => {
 
     req.user = jwt.verify(token, 'encryption-key');
 
-    next()
-  }
-  catch (err) {
+    next();
+  } catch (err) {
     if (err.name === 'JsonWebTokenError') {
       const err = new UnauthorizedError('некорректный токен, необходима авторизация');
       next(err);
     }
-    next(err)
+    next(err);
   }
-}
+};
