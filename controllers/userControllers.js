@@ -13,6 +13,7 @@ const createUser = async (req, res, next) => {
     const password = hash;
     const user = new User({ name, about, avatar, email, password });
     await user.save();
+    user.password = undefined;
     res.send(user);
 
   } catch (err) {
