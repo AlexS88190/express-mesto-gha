@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const BadRequestError = require('../errors/badRequestError');
 const NotFoundError = require('../errors/notFoundError');
+const ConflictError = require('../errors/conflictError');
 
 const createUser = async (req, res, next) => {
   try {
@@ -18,6 +19,10 @@ const createUser = async (req, res, next) => {
     if (err.name === 'ValidationError') {
       const err = new BadRequestError('переданы некорректные данные при создании пользователя');
       next(err);
+    }
+    if (err.code === 11000) {
+      const err = new ConflictError('пользователь с таким e-mail уже существует')
+      next(err)
     }
    next(err)
   }
@@ -45,7 +50,7 @@ const getUsers = async (req, res, next) => {
 
 const getUserMe = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id).select('-__v');
+    const user = await User.findById(req.user._id);
     res.send(user);
   } catch (err) {
     next(err);
@@ -60,10 +65,6 @@ const getUserById = async (req, res, next) => {
     }
     res.send(user);
   } catch (err) {
-    if (err.name === 'CastError') {
-      const err = new BadRequestError('некорректный _id пользователя');
-      next(err);
-    }
     next(err)
   }
 };
