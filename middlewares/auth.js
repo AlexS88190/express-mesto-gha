@@ -13,8 +13,8 @@ module.exports = (req, res, next) => {
     next();
   } catch (err) {
     if (err.name === 'JsonWebTokenError') {
-      const err = new UnauthorizedError('некорректный токен, необходима авторизация');
-      next(err);
+      const error = new UnauthorizedError('некорректный токен, необходима авторизация');
+      next(error);
     }
     next(err);
   }

@@ -19,5 +19,4 @@ router.use((req, res, next) => {
   next(new NotFoundError('запрос осуществляется по некорректному url'));
 });
 
-
-module.exports = router
+module.exports = router;

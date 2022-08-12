@@ -22,8 +22,8 @@ const createCard = async (req, res, next) => {
     res.send(card);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      const err = new BadRequestError('переданы некорректные данные при создании карточки');
-      next(err);
+      const error = new BadRequestError('переданы некорректные данные при создании карточки');
+      next(error);
     } else {
       next(err);
     }
@@ -39,13 +39,13 @@ const deleteCard = async (req, res, next) => {
     if (req.user._id !== card.owner.toString()) {
       throw new ForbiddenError('у вас нет прав для удаления данной карточки');
     }
-    card.remove();
+    await card.remove();
 
     res.send({ message: `карточка с id ${card._id} удалена` });
   } catch (err) {
     if (err.name === 'CastError') {
-      const err = new BadRequestError('некорректный _id карточки');
-      next(err);
+      const error = new BadRequestError('некорректный _id карточки');
+      next(error);
     } else {
       next(err);
     }
@@ -65,8 +65,8 @@ const likeCard = async (req, res, next) => {
     res.send(card);
   } catch (err) {
     if (err.name === 'CastError') {
-      const err = new BadRequestError('некорректный _id карточки');
-      next(err);
+      const error = new BadRequestError('некорректный _id карточки');
+      next(error);
     } else {
       next(err);
     }
@@ -86,8 +86,8 @@ const dislikeCard = async (req, res, next) => {
     res.send(card);
   } catch (err) {
     if (err.name === 'CastError') {
-      const err = new BadRequestError('некорректный _id карточки');
-      next(err);
+      const error = new BadRequestError('некорректный _id карточки');
+      next(error);
     } else {
       next(err);
     }
