@@ -7,6 +7,7 @@ const { celebrate, Joi } = require('celebrate');
 const cookieParser = require('cookie-parser');
 const userRoutes = require('./routes/userRoutes');
 const cardRoutes = require('./routes/cardRoutes');
+const NotFoundError = require('./errors/notFoundError');
 
 const auth = require('./middlewares/auth');
 
@@ -23,7 +24,7 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(new RegExp(/https?:\/\/[\w+.\-/?]+[a-z\-._~:/?#\[\]@!$&'()*+,;=0-9]/)),
+    avatar: Joi.string().pattern(new RegExp(/https?:\/\/((\w+[.\-\/])+\w{2,})[a-z\-._~:/?#\[\]@!$&'()*+,;=0-9]*/)),
     email: Joi.string().email().required(),
     password: Joi.string().required(),
   }),
@@ -41,8 +42,8 @@ app.use(auth);
 app.use('/cards', cardRoutes);
 app.use('/users', userRoutes);
 
-app.use('/', (req, res) => {
-  res.status(404).send({ message: 'Запрос осуществляется по некорректному url' });
+app.use('/', (req, res, next) => {
+  next(new NotFoundError('запрос осуществляется по некорректному url'));
 });
 
 app.use(errors());
@@ -50,6 +51,7 @@ app.use(errors());
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res.status(statusCode).send({ message: statusCode === 500 ? 'На сервере произошла ошибка' : message });
+  next()
 });
 
 app.listen(PORT, () => {
